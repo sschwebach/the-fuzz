@@ -31,4 +31,10 @@ public abstract class Opcode {
 
     public abstract int getArgumentCount();
 
+    /**
+     * @return An array of ArgumentType, one for each argument,
+     * describing what type that argument expects.
+     */
+    public abstract ArgumentType[] getArgumentTypes();
+
 }

@@ -55,9 +55,15 @@ public class Main {
         } while (filename.length() == 0);
 
         //Okay, start randomly generating opcodes!
+        Program program = new Program();
         while (testlength > 0) {
+            program.addOpcode(OpcodeFactory.generate(opcodes.get(
+                    (int) (Math.random() * opcodes.size())
+            )));
 
             testlength--;
         }
+
+        program.print();
     }
 }
