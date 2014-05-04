@@ -123,6 +123,9 @@ public class InstructionFactory {
     }
 
     private static void simulateLastInstruction(Program p, Instruction instr) {
+        // Sanity check on R0...
+        if (p.getRegisterFile()[0] != 0)
+            throw new RuntimeException("R0 became non-zero!");
 
         // Simulate executing this instruction based on its arguments
         // and the current program state.
@@ -154,17 +157,23 @@ public class InstructionFactory {
                 // Load this memory location into the register. Presumably
                 // the location is valid (since this came from a generator
                 // which should be providing us with valid instructions).
-                p.getRegisterFile()[
-                        instr.getArguments().get(0).value_register.getNumber()
-                        ] =
-                        p.getMemory()[
-                                p.getMemoryDataOffset() + p.getRegisterFile()[
-                                        instr.getArguments().get(1)
-                                                .value_register.getNumber()]
-                                        + instr.getArguments().get(2)
-                                        .value_immediate
-                                ];
+
+                if (instr.getArguments().get(0).value_register == Register.R0) {
+                    instr.appendComment("Don't load into R0...");
+                } else {
+                    p.getRegisterFile()[
+                            instr.getArguments().get(0).value_register.getNumber()
+                            ] =
+                            p.getMemory()[
+                                    p.getMemoryDataOffset() + p.getRegisterFile()[
+                                            instr.getArguments().get(1)
+                                                    .value_register.getNumber()]
+                                            + instr.getArguments().get(2)
+                                            .value_immediate
+                                    ];
+                }
             } else if (instr.getiOpcode().getMnemonic().equalsIgnoreCase("SW")) {
+
                 p.getMemory()[
                         p.getMemoryDataOffset() +
                                 p.getRegisterFile()[
@@ -207,7 +216,7 @@ public class InstructionFactory {
                         if (aluResult < 0)
                             setNTo = true;
                         instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
-                                aluResult + ")");
+                                (short) aluResult + ")");
                         break;
                     case ADDZ:
                         if (p.isFlag_z()) {
@@ -219,39 +228,49 @@ public class InstructionFactory {
                             if (aluResult < 0)
                                 setNTo = true;
                             instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
-                                    aluResult + ")");
+                                    (short) aluResult + ")");
                         } else {
                             instr.appendComment("(not executed)");
                         }
                         break;
                     case SUB:
-                        if (arg1 - arg2 < 2 << 15)
+                        if (arg1 - arg2 < -(2 << 15))
                             setVTo = true;
-                        aluResult = Math.max(arg1 - arg2, 2 << 15 - 1);
+                        aluResult = Math.max(arg1 - arg2, -(2 << 15));
                         if (aluResult == 0)
                             setZTo = true;
                         if (aluResult < 0)
                             setNTo = true;
+                        instr.appendComment("(" + arg1 + "-" + arg2 + "=" +
+                                (short) aluResult + ")");
                         break;
                     case AND:
                         aluResult = arg1 & arg2;
                         if (aluResult == 0)
                             setZTo = true;
+                        instr.appendComment("(" + arg1 + "&" + arg2 + "=" +
+                                (short) aluResult + ")");
                         break;
                     case NOR:
                         aluResult = ~(arg1 | arg2);
                         if (aluResult == 0)
                             setZTo = true;
+                        instr.appendComment("(~(" + arg1 + "|" + arg2 + ")=" +
+                                (short) aluResult + ")");
                         break;
                     case SLL:
                         aluResult = arg1 << arg2;
                         if (aluResult == 0)
                             setZTo = true;
+                        instr.appendComment("(" + arg1 + "<<" + arg2 + "=" +
+                                (short) aluResult + ")");
                         break;
                     case SRL:
                         aluResult = arg1 >> arg2;
                         if (aluResult == 0)
                             setZTo = true;
+                        instr.appendComment("(" + arg1 + ">>" + arg2 + "=" +
+                                (short) aluResult + ")");
                         break;
                     case SRA:
                         // This is tricky because we're doing these
@@ -260,15 +279,20 @@ public class InstructionFactory {
                         aluResult = ((short) arg1 >>> arg2);
                         if (aluResult == 0)
                             setZTo = true;
+                        instr.appendComment("(" + arg1 + ">>>" + arg2 + "=" +
+                                (short) aluResult + ")");
                         break;
                     default:
                         throw new RuntimeException("How did we get here? (1)");
                 }
 
                 // Okay, update the state of the target register with the ALU
-                // result.
-                p.getRegisterFile()[instr.getArguments().get(0)
-                        .value_register.getNumber()] = (short) aluResult;
+                // result. Don't write to R0 though...
+                if (instr.getArguments().get(0).value_register != Register.R0)
+                    p.getRegisterFile()[instr.getArguments().get(0)
+                            .value_register.getNumber()] = (short) aluResult;
+                else
+                    instr.appendComment("No change to R0");
             }
         } else if (instr.getiOpcode().getArgumentCount() == 2) {
             // This instruction potentailly changes things in memory or

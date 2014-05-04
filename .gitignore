@@ -1,1 +1,11 @@
 out/
+.idea/.name
+.idea/encodings.xml
+.idea/vcs.xml
+.idea/misc.xml
+.idea/copyright/profiles_settings.xml
+.idea/compiler.xml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/scopes/scope_settings.xml
+TheFuzz.iml

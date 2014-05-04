@@ -11,7 +11,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Welcome to TheFuzz.");
         System.out.println("Version " + VERSION);
-        System.out.println("Implemented so far: ADD ADDZ LLB LHB");
+        System.out.println("Implemented so far: ADD ADDZ LLB LHB SUB NOR AND " +
+                "SLL SRL SRA");
 
         // Gather opcodes to test.
         Scanner scan = new Scanner(System.in);
