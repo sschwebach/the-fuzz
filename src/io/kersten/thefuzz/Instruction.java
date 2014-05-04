@@ -49,6 +49,7 @@ public class Instruction {
         int c = 0;
         for (Argument a : arguments) {
             build += a.print() + (c == arguments.size() - 1 ? "" : ", ");
+            c++;
         }
 
         build += "#" + getComment();
