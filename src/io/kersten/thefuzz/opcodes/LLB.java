@@ -11,13 +11,12 @@ public class LLB extends Opcode {
 
     @Override
     public int getArgumentCount() {
-        return 3;
+        return 2;
     }
 
     @Override
     public ArgumentType[] getArgumentTypes() {
         return new ArgumentType[] {
-                ArgumentType.REGISTER,
                 ArgumentType.REGISTER,
                 ArgumentType.IMMEDIATE8
         };

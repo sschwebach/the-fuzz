@@ -7,24 +7,24 @@ import java.util.ArrayList;
  */
 public abstract class Opcode {
 
-    public static final ArrayList<String> OPCODES = new ArrayList<String>();
+    public static final ArrayList<String> MNEMONICS = new ArrayList<String>();
 
     static {
-        OPCODES.add("ADD");
-        OPCODES.add("ADDZ");
-        OPCODES.add("SUB");
-        OPCODES.add("AND");
-        OPCODES.add("NOR");
-        OPCODES.add("SLL");
-        OPCODES.add("SRL");
-        OPCODES.add("SRA");
-        OPCODES.add("LW");
-        OPCODES.add("SW");
-        OPCODES.add("LHB");
-        OPCODES.add("LLB");
-        OPCODES.add("B");
-        OPCODES.add("JAL");
-        OPCODES.add("JR");
+        MNEMONICS.add("ADD");
+        MNEMONICS.add("ADDZ");
+        MNEMONICS.add("SUB");
+        MNEMONICS.add("AND");
+        MNEMONICS.add("NOR");
+        MNEMONICS.add("SLL");
+        MNEMONICS.add("SRL");
+        MNEMONICS.add("SRA");
+        MNEMONICS.add("LW");
+        MNEMONICS.add("SW");
+        MNEMONICS.add("LHB");
+        MNEMONICS.add("LLB");
+        MNEMONICS.add("B");
+        MNEMONICS.add("JAL");
+        MNEMONICS.add("JR");
     }
 
     public abstract String getMnemonic();
@@ -36,5 +36,4 @@ public abstract class Opcode {
      * describing what type that argument expects.
      */
     public abstract ArgumentType[] getArgumentTypes();
-
 }

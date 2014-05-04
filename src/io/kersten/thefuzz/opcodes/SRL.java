@@ -18,7 +18,7 @@ public class SRL extends Opcode {
     public ArgumentType[] getArgumentTypes() {
         return new ArgumentType[] {
                 ArgumentType.REGISTER,
-                ArgumentType.REGISTER,
+                ArgumentType.VREGISTER,
                 ArgumentType.IMMEDIATE4
         };
     }

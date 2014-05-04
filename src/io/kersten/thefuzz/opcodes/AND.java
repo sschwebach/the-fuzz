@@ -19,8 +19,8 @@ public class AND extends Opcode {
     public ArgumentType[] getArgumentTypes() {
         return new ArgumentType[] {
                 ArgumentType.REGISTER,
-                ArgumentType.REGISTER,
-                ArgumentType.REGISTER
+                ArgumentType.VREGISTER,
+                ArgumentType.VREGISTER
         };
     }
 

@@ -17,7 +17,7 @@ public class JR extends Opcode {
     @Override
     public ArgumentType[] getArgumentTypes() {
         return new ArgumentType[] {
-                ArgumentType.REGISTER
+                ArgumentType.VREGISTER
         };
     }
 }
