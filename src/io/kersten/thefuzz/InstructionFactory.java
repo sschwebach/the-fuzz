@@ -131,7 +131,11 @@ public class InstructionFactory {
                 newInstrs.get(0).getArguments().get(1).value_immediate =
                         (short)offset;
 
-                newInstrs.get(0).appendComment("Load from address " + addr);
+
+                newInstrs.get(0).appendComment(newInstrs.get(0).getArguments()
+                        .get(0).value_register + "=" + p.getRegisterFile()[newInstrs.get(0).getArguments()
+                        .get(0).value_register.getNumber()] + "<-mem[" + addr
+                        + "]");
 
                 // See if we need an LHB
                 if (((short) intoReg & 0xFF00) > 0) {
@@ -198,7 +202,10 @@ public class InstructionFactory {
                 newInstrs.get(0).getArguments().get(1).value_immediate =
                         (short)offset;
 
-                newInstrs.get(0).appendComment("Store to address " + addr);
+                newInstrs.get(0).appendComment(newInstrs.get(0).getArguments()
+                        .get(0).value_register + "=" + p.getRegisterFile()[newInstrs.get(0).getArguments()
+                        .get(0).value_register.getNumber()] + "->mem[" + addr
+                        + "]");
 
                 // See if we need an LHB
                 if (((short) intoReg & 0xFF00) > 0) {
