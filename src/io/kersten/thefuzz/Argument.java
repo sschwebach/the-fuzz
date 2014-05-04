@@ -57,10 +57,10 @@ class RandomArgument extends Argument {
                 value_register = p.getRandomRegister(true);
                 break;
             case IMMEDIATE4:
-                value_immediate = (short)(Math.random() * (2 << 4));
+                value_immediate = (short)(Math.random() * (1 << 3));
                 break;
             case IMMEDIATE8:
-                value_immediate = (short)(Math.random() * (2 << 8));
+                value_immediate = (short)(Math.random() * (1 << 7));
                 break;
             case LABEL:
                 value_label = labelName;
