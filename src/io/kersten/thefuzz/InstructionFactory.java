@@ -262,7 +262,7 @@ public class InstructionFactory {
                             setZTo = true;
                         break;
                     default:
-                        throw new RuntimeException("How did we get here?");
+                        throw new RuntimeException("How did we get here? (1)");
                 }
 
                 // Okay, update the state of the target register with the ALU
@@ -275,6 +275,37 @@ public class InstructionFactory {
             // registers. I don't think these can set flags though.
             // Candidates: LHB, LLB, B
 
+            switch (instr.getiOpcode().getOpcode()) {
+                case LHB:
+                    p.getRegisterFile()[instr.getArguments().get(0)
+                            .value_register.getNumber()] = (short) ((p
+                            .getRegisterFile()[instr.getArguments().get(0)
+                            .value_register.getNumber()]) & 0xFF);
+                    p.getRegisterFile()[instr.getArguments().get(0)
+                            .value_register.getNumber()] += (instr
+                            .getArguments().get(1).value_immediate << 8);
+
+                    instr.appendComment(instr.getArguments().get(0)
+                            .value_register + "=" +
+                            p.getRegisterFile()[instr.getArguments().get(0)
+                                    .value_register.getNumber()]);
+                    break;
+                case LLB:
+                    p.getRegisterFile()[instr.getArguments().get(0)
+                            .value_register.getNumber()] = (instr
+                            .getArguments().get(1).value_immediate);
+
+                    instr.appendComment(instr.getArguments().get(0)
+                            .value_register + "=" +
+                            p.getRegisterFile()[instr.getArguments().get(0)
+                                    .value_register.getNumber()]);
+                    break;
+                case B:
+                    throw new RuntimeException("Branching not implemented yet" +
+                            ".");
+                default:
+                    throw new RuntimeException("How did we get here? (2)");
+            }
             //TODO
         } else {
             // These instructions just modify the PC.

@@ -52,7 +52,7 @@ public class Instruction {
             c++;
         }
 
-        build += "#" + getComment();
+        build += " #" + getComment();
         return build;
     }
 
