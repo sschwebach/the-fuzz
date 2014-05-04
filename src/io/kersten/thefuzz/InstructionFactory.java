@@ -87,6 +87,152 @@ public class InstructionFactory {
             // generated (again, register + immOffset) is less than 65536 minus
             // dataOffset. Subtle but important.
 
+            if (mnemonic.equalsIgnoreCase("LW")) {
+                // Generate a valid memory address to load from...
+                if (p.getValidMemory().size() == 0) {
+                    // No valid addresses - can't generate a load instruction
+                    // yet!
+                    //TODO Make sure we add things to this when generating sw's
+                    return new ArrayList<Instruction>();
+                }
+
+                int addr = p.getValidMemory().get((int) (Math.random() * p
+                        .getValidMemory().size()));
+
+                // Think of a split for how we want to index ths memory...
+                // Maximum offset is 4 bits, so we'll want to be able to go
+                // +7/-8 on it.
+                int offset = (int) (Math.random() * 16) - 8;
+
+                // Need to insert the address less the offset into some random
+                // register...
+                int intoReg = addr - offset; // These will already be offset
+                // by p.getMemoryDataOffset, since
+                // they're in the valid list.
+
+                // Need to get this value into a register. Need to use a LHB
+                // potentially, and definitely a LLB.
+
+                // First select a register to write the address into
+                Register chosenRegister;
+
+                do {
+                    chosenRegister = p.getRandomRegister(false);
+                } while (chosenRegister == Register.R0);
+
+                // set up the lw instruction
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.REGISTER, null, null));
+                newInstrs.get(0).getArguments().get(0).value_register =
+                        chosenRegister;
+
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.IMMEDIATE4, null, null));
+                newInstrs.get(0).getArguments().get(1).value_immediate =
+                        (short)offset;
+
+                newInstrs.get(0).appendComment("Load from address " + addr);
+
+                // See if we need an LHB
+                if (((short) intoReg & 0xFF00) > 0) {
+                    // Yes it's needed.
+                    newInstrs.add(0, new Instruction(new LHB()));
+                    newInstrs.get(0).addArgument(new Argument(p,
+                            ArgumentType.REGISTER, null, null));
+
+                    newInstrs.get(0).getArguments().get(0).value_register
+                            = chosenRegister;
+
+                    // Sets its value to the lower bits of the intoReg
+                    newInstrs.get(0).addArgument(new Argument(p,
+                            ArgumentType.IMMEDIATE8, null, null));
+                    newInstrs.get(0).getArguments().get(1).value_immediate =
+                            (short) ((short)(intoReg & 0xFF00) >> 8);
+                    newInstrs.get(0).appendComment("Load upper for lw");
+                }
+
+                newInstrs.add(0, new Instruction(new LLB()));
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.REGISTER, null, null));
+
+                newInstrs.get(0).getArguments().get(0).value_register =
+                        chosenRegister;
+
+                // Sets its value to the lower bits of the intoReg
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.IMMEDIATE8, null, null));
+                newInstrs.get(0).getArguments().get(1).value_immediate =
+                        (short) (intoReg & 0xFF);
+                newInstrs.get(0).appendComment("Load lower for lw");
+
+            } else {
+                // Store word. Need to find somewhere to store something and
+                // think of something to store.
+
+                // Store it somewhere in valid memory, but watch out for the
+                // data memory offset cap.
+                int addr = (int)(Math.random() * (p.getMemory().length - p
+                        .getMemoryDataOffset()));
+
+                int offset = (int) (Math.random() * 16) - 8;
+
+                int intoReg = addr - offset;
+
+                // Okay, pick a valid register whose contents we want to store.
+
+
+                // First select a register to write the address into
+                Register chosenRegister;
+
+                do {
+                    chosenRegister = p.getRandomRegister(false);
+                } while (chosenRegister == Register.R0);
+
+                // set up sw instruction
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.REGISTER, null, null));
+                newInstrs.get(0).getArguments().get(0).value_register =
+                        chosenRegister;
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.IMMEDIATE4, null, null));
+                newInstrs.get(0).getArguments().get(1).value_immediate =
+                        (short)offset;
+
+                newInstrs.get(0).appendComment("Store to address " + addr);
+
+                // See if we need an LHB
+                if (((short) intoReg & 0xFF00) > 0) {
+                    // Yes it's needed.
+                    newInstrs.add(0, new Instruction(new LHB()));
+                    newInstrs.get(0).addArgument(new Argument(p,
+                            ArgumentType.REGISTER, null, null));
+
+                    newInstrs.get(0).getArguments().get(0).value_register
+                            = chosenRegister;
+
+                    // Sets its value to the lower bits of the intoReg
+                    newInstrs.get(0).addArgument(new Argument(p,
+                            ArgumentType.IMMEDIATE8, null, null));
+                    newInstrs.get(0).getArguments().get(1).value_immediate =
+                            (short) ((short)(intoReg & 0xFF00) >> 8);
+                    newInstrs.get(0).appendComment("Load upper for sw");
+                }
+
+                newInstrs.add(0, new Instruction(new LLB()));
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.REGISTER, null, null));
+
+                newInstrs.get(0).getArguments().get(0).value_register =
+                        chosenRegister;
+
+                // Sets its value to the lower bits of the intoReg
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.IMMEDIATE8, null, null));
+                newInstrs.get(0).getArguments().get(1).value_immediate =
+                        (short) (intoReg & 0xFF);
+                newInstrs.get(0).appendComment("Load lower for sw");
+
+            }
         } else {
             // Otherwise, for each argument, assign it a value. These arguments
             // should usually just be immediate/register types since other ones

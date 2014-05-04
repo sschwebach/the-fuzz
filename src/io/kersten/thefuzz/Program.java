@@ -65,7 +65,7 @@ public class Program {
     private short registerFile[] = new short[16];
 
     private short memory[] = new short[65536];
-    private boolean validMemory[] = new boolean[65536];
+    private ArrayList<Integer> validMemory = new ArrayList<Integer>();
 
     private int memoryDataOffset = 0;   // Due to unified memory, how far into
     // memory does the data begin?
@@ -164,7 +164,7 @@ public class Program {
         return memory;
     }
 
-    public boolean[] getValidMemory() {
+    public ArrayList<Integer> getValidMemory() {
         return validMemory;
     }
 }
