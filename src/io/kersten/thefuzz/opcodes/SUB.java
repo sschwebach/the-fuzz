@@ -22,4 +22,19 @@ public class SUB extends Opcode {
                 ArgumentType.VREGISTER
         };
     }
+
+    @Override
+    public boolean setsZ() {
+        return true;
+    }
+
+    @Override
+    public boolean setsN() {
+        return true;
+    }
+
+    @Override
+    public boolean setsV() {
+        return true;
+    }
 }

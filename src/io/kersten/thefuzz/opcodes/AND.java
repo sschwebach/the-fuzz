@@ -24,4 +24,19 @@ public class AND extends Opcode {
         };
     }
 
+    @Override
+    public boolean setsZ() {
+        return true;
+    }
+
+    @Override
+    public boolean setsN() {
+        return false;
+    }
+
+    @Override
+    public boolean setsV() {
+        return false;
+    }
+
 }

@@ -20,5 +20,20 @@ public class JAL extends Opcode {
                 ArgumentType.LABEL
         };
     }
+
+    @Override
+    public boolean setsZ() {
+        return false;
+    }
+
+    @Override
+    public boolean setsN() {
+        return false;
+    }
+
+    @Override
+    public boolean setsV() {
+        return false;
+    }
 }
 

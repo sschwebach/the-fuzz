@@ -20,4 +20,19 @@ public class JR extends Opcode {
                 ArgumentType.VREGISTER
         };
     }
+
+    @Override
+    public boolean setsZ() {
+        return false;
+    }
+
+    @Override
+    public boolean setsN() {
+        return false;
+    }
+
+    @Override
+    public boolean setsV() {
+        return false;
+    }
 }

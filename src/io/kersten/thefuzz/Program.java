@@ -64,11 +64,18 @@ public class Program {
 
     private short registerFile[] = new short[16];
 
+    private short memory[] = new short[65536];
+    private boolean validMemory[] = new boolean[65536];
+
+    private int memoryDataOffset = 0;   // Due to unified memory, how far into
+                                        // memory does the data begin?
+
     private ArrayList<Instruction> instructions = new ArrayList<Instruction>();
 
-    public Program() {
+    public Program(int memoryDataOffset) {
         validRegisters[0] = true; // R0 is always valid since it's tied to 0.
         registerFile[0] = 0;
+        this.memoryDataOffset = memoryDataOffset;
     }
 
     public void addInstructions(List<Instruction> instrs) {
@@ -140,5 +147,17 @@ public class Program {
 
     public short[] getRegisterFile() {
         return registerFile;
+    }
+
+    public int getMemoryDataOffset() {
+        return memoryDataOffset;
+    }
+
+    public short[] getMemory() {
+        return memory;
+    }
+
+    public boolean[] getValidMemory() {
+        return validMemory;
     }
 }

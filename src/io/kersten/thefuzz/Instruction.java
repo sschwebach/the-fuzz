@@ -47,4 +47,8 @@ public class Instruction {
         build += " #" + getComment();
         return build;
     }
+
+    public Opcode getOpcode() {
+        return opcode;
+    }
 }

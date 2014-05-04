@@ -48,6 +48,22 @@ public class Main {
 
         scan.nextLine();    // Clear the return from the integer read
 
+        // What is the memory data offset?
+        int dataoffset = -1;
+
+        do {
+            try {
+                System.out.print("Memory data offset? (Try 30000): ");
+                dataoffset = scan.nextInt();
+            } catch (InputMismatchException ime) {
+                // Not a number...
+                scan.nextLine(); // Clear buffer...
+                testlength = -1; // ...and try again
+            }
+        } while (testlength <= 0);
+
+        scan.nextLine();    // Clear the return from the integer read
+
         String filename;
         do {
             System.out.print("Save file as: ");
@@ -55,15 +71,15 @@ public class Main {
         } while (filename.length() == 0);
 
         //Okay, start randomly generating opcodes!
-        Program program = new Program();
+        /*Program program = new Program(dataoffset);
         while (testlength > 0) {
-            program.addInstructions(OpcodeFactory.generate(opcodes.get(
+            program.addInstructions(InstructionFactory.generateInstruction(opcodes.get(
                     (int) (Math.random() * opcodes.size())
             )));
 
             testlength--;
         }
 
-        program.print();
+        program.print();*/
     }
 }

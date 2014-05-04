@@ -22,4 +22,19 @@ public class LW extends Opcode {
                 ArgumentType.IMMEDIATE4
         };
     }
+
+    @Override
+    public boolean setsZ() {
+        return false;
+    }
+
+    @Override
+    public boolean setsN() {
+        return false;
+    }
+
+    @Override
+    public boolean setsV() {
+        return false;
+    }
 }

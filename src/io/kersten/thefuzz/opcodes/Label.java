@@ -25,4 +25,19 @@ public class Label extends Opcode {
     public ArgumentType[] getArgumentTypes() {
         return new ArgumentType[] {};
     }
+
+    @Override
+    public boolean setsZ() {
+        return false;
+    }
+
+    @Override
+    public boolean setsN() {
+        return false;
+    }
+
+    @Override
+    public boolean setsV() {
+        return false;
+    }
 }

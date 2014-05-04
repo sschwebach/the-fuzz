@@ -7,7 +7,7 @@ public class Argument {
 
     // Only one of these will be set, and when we return a value for the string
     // rendering, we'll insert based on one of these.
-    short value_immedaite;  // Really max length is a byte but don't want to
+    short value_immediate;  // Really max length is a byte but don't want to
                             // auto sign-extend.
     Condition value_condition;
     Register value_register;
@@ -27,7 +27,7 @@ public class Argument {
                 return value_register.name();
             case IMMEDIATE4:
             case IMMEDIATE8:
-                return "" + value_immedaite;
+                return "" + value_immediate;
             case LABEL:
                 return value_label;
             case CONDITION:
@@ -57,10 +57,10 @@ class RandomArgument extends Argument {
                 value_register = p.getRandomRegister(true);
                 break;
             case IMMEDIATE4:
-                value_immedaite = (short)(Math.random() * (2 << 4));
+                value_immediate = (short)(Math.random() * (2 << 4));
                 break;
             case IMMEDIATE8:
-                value_immedaite = (short)(Math.random() * (2 << 8));
+                value_immediate = (short)(Math.random() * (2 << 8));
                 break;
             case LABEL:
                 value_label = labelName;

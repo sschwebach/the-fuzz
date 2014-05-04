@@ -36,4 +36,10 @@ public abstract class Opcode {
      * describing what type that argument expects.
      */
     public abstract ArgumentType[] getArgumentTypes();
+
+    public abstract boolean setsZ();
+
+    public abstract boolean setsN();
+
+    public abstract boolean setsV();
 }
