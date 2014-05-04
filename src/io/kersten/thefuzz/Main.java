@@ -57,7 +57,7 @@ public class Main {
         //Okay, start randomly generating opcodes!
         Program program = new Program();
         while (testlength > 0) {
-            program.addOpcodes(OpcodeFactory.generate(opcodes.get(
+            program.addInstructions(OpcodeFactory.generate(opcodes.get(
                     (int) (Math.random() * opcodes.size())
             )));
 
