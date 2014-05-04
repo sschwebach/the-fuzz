@@ -1,9 +1,13 @@
 package io.kersten.thefuzz.opcodes;
 
 import io.kersten.thefuzz.ArgumentType;
-import io.kersten.thefuzz.Opcode;
+import io.kersten.thefuzz.IOpcode;
 
-public class ADD extends Opcode {
+public class ADD extends IOpcode {
+    public ADD() {
+        super(Opcode.ADD);
+    }
+
     @Override
     public String getMnemonic() {
         return "ADD";

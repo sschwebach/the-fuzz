@@ -1,9 +1,13 @@
 package io.kersten.thefuzz.opcodes;
 
 import io.kersten.thefuzz.ArgumentType;
-import io.kersten.thefuzz.Opcode;
+import io.kersten.thefuzz.IOpcode;
 
-public class NOR extends Opcode {
+public class NOR extends IOpcode {
+    public NOR() {
+        super(Opcode.NOR);
+    }
+
     @Override
     public String getMnemonic() {
         return "NOR";

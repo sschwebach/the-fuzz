@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class Instruction {
 
-    private Opcode opcode;
+    private IOpcode iOpcode;
 
     private ArrayList<Argument> arguments;
 
@@ -17,8 +17,8 @@ public class Instruction {
     private String comment;
 
 
-    public Instruction(Opcode opcode) {
-        this.opcode = opcode;
+    public Instruction(IOpcode iOpcode) {
+        this.iOpcode = iOpcode;
     }
 
     public ArrayList<Argument> getArguments() {
@@ -37,8 +37,12 @@ public class Instruction {
         this.comment = comment;
     }
 
+    public void appendComment(String ap) {
+        setComment(getComment() + "; " + ap);
+    }
+
     public String print() {
-        String build = opcode.getMnemonic();
+        String build = iOpcode.getMnemonic();
 
         for (Argument a : arguments) {
             build += " " + a.print();
@@ -48,7 +52,7 @@ public class Instruction {
         return build;
     }
 
-    public Opcode getOpcode() {
-        return opcode;
+    public IOpcode getiOpcode() {
+        return iOpcode;
     }
 }

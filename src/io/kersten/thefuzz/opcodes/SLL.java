@@ -1,9 +1,14 @@
 package io.kersten.thefuzz.opcodes;
 
 import io.kersten.thefuzz.ArgumentType;
-import io.kersten.thefuzz.Opcode;
+import io.kersten.thefuzz.IOpcode;
 
-public class SLL extends Opcode {
+public class SLL extends IOpcode {
+
+    public SLL() {
+        super(Opcode.SLL);
+    }
+
     @Override
     public String getMnemonic() {
         return "SLL";

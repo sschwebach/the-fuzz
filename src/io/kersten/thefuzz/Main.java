@@ -21,7 +21,7 @@ public class Main {
         ArrayList<String> opcodes = new ArrayList<String>();
 
         for (String s : tmpopcodes) {
-            if (Opcode.MNEMONICS.contains(s.toUpperCase()))
+            if (IOpcode.isValidOpcode(s.toUpperCase()))
                 opcodes.add(s.toUpperCase());
             else if (s.length() > 0)
                 System.out.println("Not an opcode: " + s);
@@ -29,7 +29,8 @@ public class Main {
 
         if (opcodes.size() == 0) {
             System.out.println("Testing all opcodes.");
-            opcodes.addAll(Opcode.MNEMONICS);
+
+            opcodes.addAll(IOpcode.getAllOpcodes());
         }
 
         // How long should the tests be?
@@ -71,15 +72,15 @@ public class Main {
         } while (filename.length() == 0);
 
         //Okay, start randomly generating opcodes!
-        /*Program program = new Program(dataoffset);
+        Program program = new Program(dataoffset);
         while (testlength > 0) {
-            program.addInstructions(InstructionFactory.generateInstruction(opcodes.get(
-                    (int) (Math.random() * opcodes.size())
+            program.addInstructions(InstructionFactory.generateInstruction
+                    (program, opcodes.get((int) (Math.random() * opcodes.size())
             )));
 
             testlength--;
         }
 
-        program.print();*/
+        program.print();
     }
 }

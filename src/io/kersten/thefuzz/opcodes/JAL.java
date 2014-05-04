@@ -1,9 +1,14 @@
 package io.kersten.thefuzz.opcodes;
 
 import io.kersten.thefuzz.ArgumentType;
-import io.kersten.thefuzz.Opcode;
+import io.kersten.thefuzz.IOpcode;
 
-public class JAL extends Opcode {
+public class JAL extends IOpcode {
+
+    public JAL() {
+        super(Opcode.JAL);
+    }
+
     @Override
     public String getMnemonic() {
         return "JAL";

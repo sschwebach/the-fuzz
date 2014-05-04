@@ -1,10 +1,12 @@
 package io.kersten.thefuzz.opcodes;
 
 import io.kersten.thefuzz.ArgumentType;
-import io.kersten.thefuzz.Opcode;
+import io.kersten.thefuzz.IOpcode;
 
-public class AND extends Opcode {
-
+public class AND extends IOpcode {
+    public AND() {
+        super(Opcode.AND);
+    }
     @Override
     public String getMnemonic() {
         return "AND";

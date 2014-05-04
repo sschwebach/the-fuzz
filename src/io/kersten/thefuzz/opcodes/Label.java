@@ -1,13 +1,15 @@
 package io.kersten.thefuzz.opcodes;
 
 import io.kersten.thefuzz.ArgumentType;
-import io.kersten.thefuzz.Opcode;
+import io.kersten.thefuzz.IOpcode;
 
-public class Label extends Opcode {
+public class Label extends IOpcode {
 
     private String title;
 
     public Label(String title) {
+
+        super(Opcode.SRA);
         this.title = title;
     }
 

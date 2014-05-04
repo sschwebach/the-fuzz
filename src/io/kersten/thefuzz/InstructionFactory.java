@@ -31,12 +31,12 @@ public class InstructionFactory {
      */
     public static List<Instruction> generateInstruction(Program p,
                                                         String mnemonic) {
-        if (!Opcode.MNEMONICS.contains(mnemonic.toUpperCase())) {
+        if (!IOpcode.isValidOpcode(mnemonic.toUpperCase())) {
             throw new RuntimeException("Not a valid mnemonic: " + mnemonic);
         }
 
         ArrayList<Instruction> newInstrs = new ArrayList<Instruction>();
-        Opcode op = opcodeFromMnemonic(mnemonic);
+        IOpcode op = opcodeFromMnemonic(mnemonic);
 
         //Generate arguments for this opcode...
         newInstrs.add(new Instruction(op));
@@ -118,16 +118,20 @@ public class InstructionFactory {
                 if (i.getArguments().get(0).getType() == ArgumentType.REGISTER)
                     p.setRegisterValid(i.getArguments().get(0).value_register);
 
-
+        return newInstrs;
     }
 
-    private void simulateLastInstruction(Program p, Instruction instr) {
+    private static void simulateLastInstruction(Program p, Instruction instr) {
 
         // Simulate executing this instruction based on its arguments
         // and the current program state.
-        boolean wouldSetZ = false;
-        boolean wouldSetN = false;
-        boolean wouldSetV = false;
+
+        // These flag values will only be invoked if it winds up that this
+        // instruction actually should be setting flags.
+        boolean setZTo = false;
+        boolean setNTo = false;
+        boolean setVTo = false;
+
         int aluResult = 0;
         int arg1 = 0;
         int arg2 = 0;
@@ -138,74 +142,158 @@ public class InstructionFactory {
         // XXX: This might fail in the future if we ever have opcodes
         // that set flags that aren't of the pattern of TARGET, ARG1,
         // ARG2.
-        if (instr.getOpcode().getArgumentCount() == 3) {
+        if (instr.getiOpcode().getArgumentCount() == 3) {
             // Need to read arg1 and arg2 out of here. This means that this
             // instruction potentially sets flags. Ones that don't are LW and
             // SW.
             // Candidates: ADD, ADDZ, SUB, AND, NOR, SLL, SRL, SRA, LW, SW
 
             // For memory operations, update the memory or registers.
-            if (instr.getOpcode().getMnemonic().equalsIgnoreCase("LW")) {
+            if (instr.getiOpcode().getMnemonic().equalsIgnoreCase("LW")) {
                 // Load this memory location into the register. Presumably
                 // the location is valid (since this came from a generator
                 // which should be providing us with valid instructions).
                 p.getRegisterFile()[
-                        instr.getArguments().get(1).value_register.getNumber()
+                        instr.getArguments().get(0).value_register.getNumber()
                         ] =
                         p.getMemory()[
                                 p.getMemoryDataOffset() + p.getRegisterFile()[
-                                        instr.getArguments().get(2)
+                                        instr.getArguments().get(1)
                                                 .value_register.getNumber()]
-                                        + instr.getArguments().get(3)
+                                        + instr.getArguments().get(2)
                                         .value_immediate
                                 ];
-            } else if (instr.getOpcode().getMnemonic().equalsIgnoreCase("SW")) {
+            } else if (instr.getiOpcode().getMnemonic().equalsIgnoreCase("SW")) {
                 p.getMemory()[
                         p.getMemoryDataOffset() +
                                 p.getRegisterFile()[
-                                        instr.getArguments().get(2)
+                                        instr.getArguments().get(1)
                                                 .value_register.getNumber()]
-                                + instr.getArguments().get(3).value_immediate
+                                + instr.getArguments().get(2).value_immediate
                         ] =
-                        p.getRegisterFile()[instr.getArguments().get(1)
+                        p.getRegisterFile()[instr.getArguments().get(0)
                                 .value_register.getNumber()];
             } else {
                 // For ALU operations, update the registers and set flags.
 
+                // XXX: Assumptions here about argument types, again.
+                // Arg1 is always in a register.
+                arg1 = p.getRegisterFile()[instr.getArguments().get(1)
+                        .value_register.getNumber()];
+
+                // Arg2 depends on if this is a shift or not. Check for an
+                // immediate 4-bit argument.
+                if (instr.getiOpcode().getArgumentTypes()[2] ==
+                        ArgumentType.IMMEDIATE4) {
+                    arg2 = instr.getArguments().get(2).value_immediate;
+                } else if (instr.getiOpcode().getArgumentTypes()[2] ==
+                        ArgumentType.VREGISTER) {
+                    arg2 = p.getRegisterFile()[instr.getArguments().get(2)
+                            .value_register.getNumber()];
+                } else {
+                    throw new RuntimeException("Unexpected argument type " +
+                            "during simulation!");
+                }
+
+                // Perform the ALU operation.
+                switch (instr.getiOpcode().getOpcode()) {
+                    case ADD:
+                        if (arg1 + arg2 > 2 << 15 - 1)
+                            setVTo = true;
+                        aluResult = Math.min(arg1 + arg2, 2 << 15 - 1);
+                        if (aluResult == 0)
+                            setZTo = true;
+                        if (aluResult < 0)
+                            setNTo = true;
+                        break;
+                    case ADDZ:
+                        if (p.isFlag_z()) {
+                            if (arg1 + arg2 > 2 << 15 - 1)
+                                setVTo = true;
+                            aluResult = Math.min(arg1 + arg2, 2 << 15 - 1);
+                            if (aluResult == 0)
+                                setZTo = true;
+                            if (aluResult < 0)
+                                setNTo = true;
+                        }
+                        break;
+                    case SUB:
+                        if (arg1 - arg2 < 2 << 15)
+                            setVTo = true;
+                        aluResult = Math.max(arg1 - arg2, 2 << 15 - 1);
+                        if (aluResult == 0)
+                            setZTo = true;
+                        if (aluResult < 0)
+                            setNTo = true;
+                        break;
+                    case AND:
+                        aluResult = arg1 & arg2;
+                        if (aluResult == 0)
+                            setZTo = true;
+                        break;
+                    case NOR:
+                        aluResult = ~(arg1 | arg2);
+                        if (aluResult == 0)
+                            setZTo = true;
+                        break;
+                    case SLL:
+                        aluResult = arg1 << arg2;
+                        if (aluResult == 0)
+                            setZTo = true;
+                        break;
+                    case SRL:
+                        aluResult = arg1 >> arg2;
+                        if (aluResult == 0)
+                            setZTo = true;
+                        break;
+                    case SRA:
+                        // This is tricky because we're doing these
+                        // high-level on ints but need some zeros inserted
+                        // down in the 16-bit range. So cast to short first.
+                        aluResult = ((short) arg1 >>> arg2);
+                        if (aluResult == 0)
+                            setZTo = true;
+                        break;
+                    default:
+                        throw new RuntimeException("How did we get here?");
+                }
+
+                // Okay, update the state of the target register with the ALU
+                // result.
+                p.getRegisterFile()[instr.getArguments().get(0)
+                        .value_register.getNumber()] = (short) aluResult;
             }
-
-
-        } else if (instr.getOpcode().getArgumentCount() == 2) {
+        } else if (instr.getiOpcode().getArgumentCount() == 2) {
             // This instruction potentailly changes things in memory or
             // registers. I don't think these can set flags though.
             // Candidates: LHB, LLB, B
+
+            //TODO
         } else {
             // These instructions just modify the PC.
             // Candidates: JAL, JR
+
+            //TODO
         }
 
-        if (instr.getOpcode().getMnemonic().equalsIgnoreCase("ADD")
-        switch (instr.getOpcode().) {
-
+        // Now, set flags if the previous instruction would have.
+        if (instr.getiOpcode().setsZ()) {
+            p.setFlag_z(setNTo);
+            instr.appendComment("Z->" + (setZTo ? "1" : "0"));
         }
 
-        // Check if this instruction sets flags.
-
-        if (instr.getOpcode().setsZ() ||
-                instr.getOpcode().setsN() ||
-                instr.getOpcode().setsV()) {
-
-            int arg1, arg2; //Integers because it's easy to detect overflow and
-            // saturate our 16-bit registers. Some of these are immediate
-            // arguments and some are register arguments...
-            int arg1 = newInstrs.get(0).getArguments().get(1).val
+        if (instr.getiOpcode().setsN()) {
+            p.setFlag_n(setNTo);
+            instr.appendComment("N->" + (setNTo ? "1" : "0"));
         }
 
-        int arg1 = (newInstrs.get(1).)
-        newInstrs.get(0).setComment("random fuzz");
+        if (instr.getiOpcode().setsV()) {
+            p.setFlag_v(setNTo);
+            instr.appendComment("V->" + (setVTo ? "1" : "0"));
+        }
     }
 
-    public static Opcode opcodeFromMnemonic(String mnemonic) {
+    public static IOpcode opcodeFromMnemonic(String mnemonic) {
         if (mnemonic.equalsIgnoreCase("ADD")) {
             return new ADD();
         }
@@ -246,8 +334,12 @@ public class InstructionFactory {
             return new SW();
         }
 
-        if (mnemonic.equalsIgnoreCase("LHB")) {
+        if (mnemonic.equalsIgnoreCase("LLB")) {
             return new LLB();
+        }
+
+        if (mnemonic.equalsIgnoreCase("LHB")) {
+            return new LHB();
         }
 
         if (mnemonic.equalsIgnoreCase("B")) {
