@@ -42,13 +42,14 @@ public class Instruction {
     }
 
     public String print() {
-        String build = iOpcode.getMnemonic();
+        String build = iOpcode.getMnemonic() + " ";
 
+        int c = 0;
         for (Argument a : arguments) {
-            build += " " + a.print();
+            build += a.print() + (c == arguments.size() - 1 ? "" : ", ");
         }
 
-        build += " #" + getComment();
+        build += "#" + getComment();
         return build;
     }
 

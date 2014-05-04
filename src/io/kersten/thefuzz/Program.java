@@ -68,7 +68,7 @@ public class Program {
     private boolean validMemory[] = new boolean[65536];
 
     private int memoryDataOffset = 0;   // Due to unified memory, how far into
-                                        // memory does the data begin?
+    // memory does the data begin?
 
     private ArrayList<Instruction> instructions = new ArrayList<Instruction>();
 
@@ -84,8 +84,14 @@ public class Program {
     }
 
     public String print() {
-        //TODO
-        return null;
+        String build = "";
+
+        for (Instruction i : instructions) {
+            build += i.print() + "\n";
+            System.out.println(i.print());
+        }
+
+        return build;
     }
 
     public int getLabelCount() {
@@ -106,6 +112,7 @@ public class Program {
 
     /**
      * Selects a register at random.
+     *
      * @param mustBeValid If true, only select registers which are valid.
      * @return A randomly selected register.
      */
