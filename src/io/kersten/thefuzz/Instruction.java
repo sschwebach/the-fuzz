@@ -1,5 +1,7 @@
 package io.kersten.thefuzz;
 
+import com.sun.org.apache.xpath.internal.Arg;
+
 import java.util.ArrayList;
 
 /**
@@ -10,11 +12,11 @@ public class Instruction {
 
     private IOpcode iOpcode;
 
-    private ArrayList<Argument> arguments;
+    private ArrayList<Argument> arguments = new ArrayList<Argument>();
 
     // This will show up in the output assembly - generator can put reasons
     // here detailing what it expects about a certain line.
-    private String comment;
+    private String comment = "";
 
 
     public Instruction(IOpcode iOpcode) {

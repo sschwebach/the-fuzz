@@ -101,13 +101,14 @@ public class InstructionFactory {
                             "logic.");
                 }
 
+                // For each argument the instruction expects, add a random one.
                 newInstrs.get(0).addArgument(new RandomArgument(p, t, null,
                         null));
 
-                simulateLastInstruction(p, newInstrs.get(0));
+
             }
 
-
+            simulateLastInstruction(p, newInstrs.get(0));
         }
 
         // Look at any generated instructions' target registers and set them to
@@ -205,6 +206,8 @@ public class InstructionFactory {
                             setZTo = true;
                         if (aluResult < 0)
                             setNTo = true;
+                        instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
+                                aluResult + ")");
                         break;
                     case ADDZ:
                         if (p.isFlag_z()) {
@@ -215,6 +218,10 @@ public class InstructionFactory {
                                 setZTo = true;
                             if (aluResult < 0)
                                 setNTo = true;
+                            instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
+                                    aluResult + ")");
+                        } else {
+                            instr.appendComment("(not executed)");
                         }
                         break;
                     case SUB:
@@ -278,7 +285,7 @@ public class InstructionFactory {
 
         // Now, set flags if the previous instruction would have.
         if (instr.getiOpcode().setsZ()) {
-            p.setFlag_z(setNTo);
+            p.setFlag_z(setZTo);
             instr.appendComment("Z->" + (setZTo ? "1" : "0"));
         }
 
@@ -288,7 +295,7 @@ public class InstructionFactory {
         }
 
         if (instr.getiOpcode().setsV()) {
-            p.setFlag_v(setNTo);
+            p.setFlag_v(setVTo);
             instr.appendComment("V->" + (setVTo ? "1" : "0"));
         }
     }
