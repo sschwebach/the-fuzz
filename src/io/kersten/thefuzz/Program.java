@@ -167,4 +167,10 @@ public class Program {
     public ArrayList<Integer> getValidMemory() {
         return validMemory;
     }
+
+    public void dumpRegisters() {
+        for (int i = 0 ; i < registerFile.length; i++) {
+            System.out.println("R" + i + "=" + registerFile[i]);
+        }
+    }
 }

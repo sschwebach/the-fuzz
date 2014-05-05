@@ -187,12 +187,19 @@ public class InstructionFactory {
 
                 // Store it somewhere in valid memory, but watch out for the
                 // data memory offset cap.
-                int addr = (int) (Math.random() * (p.getMemory().length - p
+                int addr;
+
+                // Eh, screw it, keep addresses positive in 16-bit signed.
+                do {
+                    addr = (int) (Math.random() * (p.getMemory().length - p
                         .getMemoryDataOffset()));
+                } while (addr > (2 << 15 - 1));
 
                 int offset = (int) (Math.random() * 16) - 8;
 
                 int intoReg = addr - offset;
+
+                p.getValidMemory().add(addr);
 
                 // Okay, pick a valid register whose contents we want to store.
 
