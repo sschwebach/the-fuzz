@@ -350,23 +350,6 @@ public class InstructionFactory {
                                     ];
                 }
             } else if (instr.getiOpcode().getMnemonic().equalsIgnoreCase("SW")) {
-
-                System.out.println(p.getMemory());
-                System.out.println(p.getMemoryDataOffset());
-                System.out.println(p.getRegisterFile());
-                System.out.println(instr.getArguments());
-                System.out.println(instr.getArguments().get(1));
-                System.out.println(instr.getArguments().get(2));
-                System.out.println(instr.getArguments().get(0));
-System.out.println("AAAAAAA");
-
-                System.out.println(instr.getArguments().get(2).value_immediate);
-                System.out.println(instr.getArguments().get(0).value_register
-                        .getNumber());
-
-                System.out.println(instr.getArguments().get(1).value_register
-                        .getNumber());
-
                 p.getMemory()[
                         p.getMemoryDataOffset() +
                                 p.getRegisterFile()[
