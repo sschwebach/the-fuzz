@@ -162,8 +162,6 @@ public class InstructionFactory {
                     newInstrs.get(0).getArguments().get(1).value_immediate =
                             (short) ((short) (intoReg & 0xFF00) >> 8);
                     newInstrs.get(0).appendComment("Load upper for lw");
-
-                    simulateLastInstruction(p, newInstrs.get(0));
                 }
 
                 newInstrs.add(0, new Instruction(new LLB()));
@@ -180,10 +178,9 @@ public class InstructionFactory {
                         (short) (intoReg & 0xFF);
                 newInstrs.get(0).appendComment("Load lower for l-w");
 
-                simulateLastInstruction(p, newInstrs.get(0)); // simulate LLB
-                // then simulate the load
-                simulateLastInstruction(p, newInstrs.get(newInstrs.size() - 1));
-
+                for (Instruction i : newInstrs) {
+                    simulateLastInstruction(p, i);
+                }
             } else {
                 // Store word. Need to find somewhere to store something and
                 // think of something to store.
@@ -241,8 +238,6 @@ public class InstructionFactory {
                     newInstrs.get(0).getArguments().get(1).value_immediate =
                             (short) ((short) (intoReg & 0xFF00) >> 8);
                     newInstrs.get(0).appendComment("Load upper for sw");
-
-                    simulateLastInstruction(p, newInstrs.get(0));
                 }
 
                 newInstrs.add(0, new Instruction(new LLB()));
@@ -259,8 +254,9 @@ public class InstructionFactory {
                         (short) (intoReg & 0xFF);
                 newInstrs.get(0).appendComment("Load lower for sw");
 
-                simulateLastInstruction(p, newInstrs.get(0));
-                simulateLastInstruction(p, newInstrs.get(newInstrs.size() - 1));
+                for (Instruction i : newInstrs) {
+                    simulateLastInstruction(p, i);
+                }
             }
         } else {
             // Otherwise, for each argument, assign it a value. These arguments
