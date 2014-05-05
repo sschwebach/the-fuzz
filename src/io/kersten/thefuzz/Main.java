@@ -84,6 +84,7 @@ public class Main {
             testlength--;
         }
 
+        System.out.println("");
         program.print();
     }
 }
