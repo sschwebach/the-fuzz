@@ -6,13 +6,13 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "0.0.2";
 
     public static void main(String[] args) {
         System.out.println("Welcome to TheFuzz.");
         System.out.println("Version " + VERSION);
-        System.out.println("Implemented so far: ADD ADDZ LLB LHB SUB NOR AND " +
-                "SLL SRL SRA");
+        System.out.println("Implemented so far: ADD ADDZ LLB LHB SLL SRL SRA " +
+                "LW SW");
 
         // Gather opcodes to test.
         Scanner scan = new Scanner(System.in);

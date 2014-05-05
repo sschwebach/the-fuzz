@@ -141,8 +141,7 @@ public class InstructionFactory {
 
 
                 newInstrs.get(0).appendComment(newInstrs.get(0).getArguments()
-                        .get(0).value_register + "=" + p.getRegisterFile()[newInstrs.get(0).getArguments()
-                        .get(0).value_register.getNumber()] + "<-mem[" + addr
+                        .get(0).value_register + "<-mem[" + addr
                         + "]");
 
                 // See if we need an LHB
@@ -176,7 +175,7 @@ public class InstructionFactory {
                         ArgumentType.IMMEDIATE8, null, null));
                 newInstrs.get(0).getArguments().get(1).value_immediate =
                         (short) (intoReg & 0xFF);
-                newInstrs.get(0).appendComment("Load lower for l-w");
+                newInstrs.get(0).appendComment("Load lower for lw");
 
                 for (Instruction i : newInstrs) {
                     simulateLastInstruction(p, i);
