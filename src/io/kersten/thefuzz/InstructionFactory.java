@@ -58,7 +58,7 @@ public class InstructionFactory {
             // 2) Generate failure and success paths - this could be in
             // either order (i.e. this can generate both taken and not-taken
             // branches).
-
+            return new ArrayList<Instruction>(); //todo
         } else if (mnemonic.equalsIgnoreCase("JAL")) {
             //TODO
 
@@ -67,14 +67,14 @@ public class InstructionFactory {
             // since it's an unconditional).
             // 2) Generate a label to branch to and insert at the end of the
             // generated instructions.
-
+            return new ArrayList<Instruction>(); //todo
         } else if (mnemonic.equalsIgnoreCase("JR")) {
             //TODO
 
             // Need to do the following:
             // 1) Generate a failure path (right after the jump).
             // 2) Generate a label to branch to.
-
+            return new ArrayList<Instruction>(); //todo
 
         } else if (mnemonic.equalsIgnoreCase("LW") || mnemonic
                 .equalsIgnoreCase("SW")) {
