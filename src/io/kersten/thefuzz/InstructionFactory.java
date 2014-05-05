@@ -113,7 +113,7 @@ public class InstructionFactory {
                 // Need to get this value into a register. Need to use a LHB
                 // potentially, and definitely a LLB.
 
-                // First select a register to write the address into
+                // First select a register to form the address
                 Register chosenRegister;
 
                 do {
@@ -123,13 +123,21 @@ public class InstructionFactory {
                 // set up the lw instruction
                 newInstrs.get(0).addArgument(new Argument(p,
                         ArgumentType.REGISTER, null, null));
-                newInstrs.get(0).getArguments().get(0).value_register =
-                        chosenRegister;
+
+                do {
+                    newInstrs.get(0).getArguments().get(0).value_register =
+                            p.getRandomRegister(false);
+                } while (newInstrs.get(0).getArguments().get(0)
+                        .value_register == Register.R0);
 
                 newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.REGISTER, null, null));
+                newInstrs.get(0).getArguments().get(1).value_register =
+                        chosenRegister;
+                newInstrs.get(0).addArgument(new Argument(p,
                         ArgumentType.IMMEDIATE4, null, null));
-                newInstrs.get(0).getArguments().get(1).value_immediate =
-                        (short)offset;
+                newInstrs.get(0).getArguments().get(2).value_immediate =
+                        (short) offset;
 
 
                 newInstrs.get(0).appendComment(newInstrs.get(0).getArguments()
@@ -140,6 +148,7 @@ public class InstructionFactory {
                 // See if we need an LHB
                 if (((short) intoReg & 0xFF00) > 0) {
                     // Yes it's needed.
+
                     newInstrs.add(0, new Instruction(new LHB()));
                     newInstrs.get(0).addArgument(new Argument(p,
                             ArgumentType.REGISTER, null, null));
@@ -151,8 +160,10 @@ public class InstructionFactory {
                     newInstrs.get(0).addArgument(new Argument(p,
                             ArgumentType.IMMEDIATE8, null, null));
                     newInstrs.get(0).getArguments().get(1).value_immediate =
-                            (short) ((short)(intoReg & 0xFF00) >> 8);
+                            (short) ((short) (intoReg & 0xFF00) >> 8);
                     newInstrs.get(0).appendComment("Load upper for lw");
+
+                    simulateLastInstruction(p, newInstrs.get(0));
                 }
 
                 newInstrs.add(0, new Instruction(new LLB()));
@@ -167,7 +178,11 @@ public class InstructionFactory {
                         ArgumentType.IMMEDIATE8, null, null));
                 newInstrs.get(0).getArguments().get(1).value_immediate =
                         (short) (intoReg & 0xFF);
-                newInstrs.get(0).appendComment("Load lower for lw");
+                newInstrs.get(0).appendComment("Load lower for l-w");
+
+                simulateLastInstruction(p, newInstrs.get(0)); // simulate LLB
+                // then simulate the load
+                simulateLastInstruction(p, newInstrs.get(newInstrs.size() - 1));
 
             } else {
                 // Store word. Need to find somewhere to store something and
@@ -175,7 +190,7 @@ public class InstructionFactory {
 
                 // Store it somewhere in valid memory, but watch out for the
                 // data memory offset cap.
-                int addr = (int)(Math.random() * (p.getMemory().length - p
+                int addr = (int) (Math.random() * (p.getMemory().length - p
                         .getMemoryDataOffset()));
 
                 int offset = (int) (Math.random() * 16) - 8;
@@ -184,8 +199,7 @@ public class InstructionFactory {
 
                 // Okay, pick a valid register whose contents we want to store.
 
-
-                // First select a register to write the address into
+                // First select a register to form the address
                 Register chosenRegister;
 
                 do {
@@ -196,11 +210,15 @@ public class InstructionFactory {
                 newInstrs.get(0).addArgument(new Argument(p,
                         ArgumentType.REGISTER, null, null));
                 newInstrs.get(0).getArguments().get(0).value_register =
+                        p.getRandomRegister(true);
+                newInstrs.get(0).addArgument(new Argument(p,
+                        ArgumentType.REGISTER, null, null));
+                newInstrs.get(0).getArguments().get(1).value_register =
                         chosenRegister;
                 newInstrs.get(0).addArgument(new Argument(p,
                         ArgumentType.IMMEDIATE4, null, null));
-                newInstrs.get(0).getArguments().get(1).value_immediate =
-                        (short)offset;
+                newInstrs.get(0).getArguments().get(2).value_immediate =
+                        (short) offset;
 
                 newInstrs.get(0).appendComment(newInstrs.get(0).getArguments()
                         .get(0).value_register + "=" + p.getRegisterFile()[newInstrs.get(0).getArguments()
@@ -221,8 +239,10 @@ public class InstructionFactory {
                     newInstrs.get(0).addArgument(new Argument(p,
                             ArgumentType.IMMEDIATE8, null, null));
                     newInstrs.get(0).getArguments().get(1).value_immediate =
-                            (short) ((short)(intoReg & 0xFF00) >> 8);
+                            (short) ((short) (intoReg & 0xFF00) >> 8);
                     newInstrs.get(0).appendComment("Load upper for sw");
+
+                    simulateLastInstruction(p, newInstrs.get(0));
                 }
 
                 newInstrs.add(0, new Instruction(new LLB()));
@@ -239,6 +259,8 @@ public class InstructionFactory {
                         (short) (intoReg & 0xFF);
                 newInstrs.get(0).appendComment("Load lower for sw");
 
+                simulateLastInstruction(p, newInstrs.get(0));
+                simulateLastInstruction(p, newInstrs.get(newInstrs.size() - 1));
             }
         } else {
             // Otherwise, for each argument, assign it a value. These arguments
@@ -277,8 +299,10 @@ public class InstructionFactory {
 
     private static void simulateLastInstruction(Program p, Instruction instr) {
         // Sanity check on R0...
-        if (p.getRegisterFile()[0] != 0)
+        if (p.getRegisterFile()[0] != 0) {
+            p.print();
             throw new RuntimeException("R0 became non-zero!");
+        }
 
         // Simulate executing this instruction based on its arguments
         // and the current program state.
@@ -312,7 +336,7 @@ public class InstructionFactory {
                 // which should be providing us with valid instructions).
 
                 if (instr.getArguments().get(0).value_register == Register.R0) {
-                    instr.appendComment("Don't load into R0...");
+                    instr.appendComment("No change to R0");
                 } else {
                     p.getRegisterFile()[
                             instr.getArguments().get(0).value_register.getNumber()
@@ -326,6 +350,22 @@ public class InstructionFactory {
                                     ];
                 }
             } else if (instr.getiOpcode().getMnemonic().equalsIgnoreCase("SW")) {
+
+                System.out.println(p.getMemory());
+                System.out.println(p.getMemoryDataOffset());
+                System.out.println(p.getRegisterFile());
+                System.out.println(instr.getArguments());
+                System.out.println(instr.getArguments().get(1));
+                System.out.println(instr.getArguments().get(2));
+                System.out.println(instr.getArguments().get(0));
+System.out.println("AAAAAAA");
+
+                System.out.println(instr.getArguments().get(2).value_immediate);
+                System.out.println(instr.getArguments().get(0).value_register
+                        .getNumber());
+
+                System.out.println(instr.getArguments().get(1).value_register
+                        .getNumber());
 
                 p.getMemory()[
                         p.getMemoryDataOffset() +
@@ -454,23 +494,32 @@ public class InstructionFactory {
 
             switch (instr.getiOpcode().getOpcode()) {
                 case LHB:
-                    p.getRegisterFile()[instr.getArguments().get(0)
-                            .value_register.getNumber()] = (short) ((p
-                            .getRegisterFile()[instr.getArguments().get(0)
-                            .value_register.getNumber()]) & 0xFF);
-                    p.getRegisterFile()[instr.getArguments().get(0)
-                            .value_register.getNumber()] += (instr
-                            .getArguments().get(1).value_immediate << 8);
-
+                    if (instr.getArguments().get(0).value_register != Register
+                            .R0) {
+                        p.getRegisterFile()[instr.getArguments().get(0)
+                                .value_register.getNumber()] = (short) ((p
+                                .getRegisterFile()[instr.getArguments().get(0)
+                                .value_register.getNumber()]) & 0xFF);
+                        p.getRegisterFile()[instr.getArguments().get(0)
+                                .value_register.getNumber()] += (instr
+                                .getArguments().get(1).value_immediate << 8);
+                    } else {
+                        instr.appendComment("No change to R0");
+                    }
                     instr.appendComment(instr.getArguments().get(0)
                             .value_register + "=" +
                             p.getRegisterFile()[instr.getArguments().get(0)
                                     .value_register.getNumber()]);
                     break;
                 case LLB:
+                    if (instr.getArguments().get(0).value_register != Register
+                            .R0) {
                     p.getRegisterFile()[instr.getArguments().get(0)
                             .value_register.getNumber()] = (instr
                             .getArguments().get(1).value_immediate);
+                    } else {
+                        instr.appendComment("No change to R0");
+                    }
 
                     instr.appendComment(instr.getArguments().get(0)
                             .value_register + "=" +
