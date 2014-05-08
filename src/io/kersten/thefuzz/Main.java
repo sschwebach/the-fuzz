@@ -1,8 +1,11 @@
 package io.kersten.thefuzz;
 
+import io.kersten.thefuzz.opcodes.HLT;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
@@ -84,6 +87,8 @@ public class Main {
 
             testlength--;
         }
+
+        program.terminate();
 
         System.out.println("");
         String output = program.print();

@@ -1,5 +1,7 @@
 package io.kersten.thefuzz;
 
+import io.kersten.thefuzz.opcodes.HLT;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -172,5 +174,35 @@ public class Program {
         for (int i = 0 ; i < registerFile.length; i++) {
             System.out.println("R" + i + "=" + registerFile[i]);
         }
+    }
+
+    /**
+     * Insert a HLT at the end of the program. For its comment,
+     * print the expected values of the registers, flags,
+     * and valid memory addresses.
+     */
+    public void terminate() {
+        instructions.add(new Instruction(new HLT()));
+
+        String finalState = "\n";
+
+        // Summarize registers
+        for (int i = 0; i < registerFile.length; i++) {
+            finalState += "\n# R" + i + " = " + registerFile[i];
+        }
+
+        // Summarize flags
+        finalState += "\n\n# Z =" + (isFlag_z() ? "1" : "0") + " N = " +
+                (isFlag_n()
+                ? "1" : "0") + " V = " + (isFlag_v() ? "1" : "0");
+
+        // Summarize memory:
+        finalState += "\n# Valid memory addresses:";
+        for (int i : validMemory) {
+            finalState += "\n#    mem[" + i + "] = " + memory[i];
+        }
+
+
+        instructions.get(instructions.size() - 1).appendComment(finalState);
     }
 }
