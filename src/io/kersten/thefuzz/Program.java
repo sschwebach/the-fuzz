@@ -198,7 +198,7 @@ public class Program {
                 ? "1" : "0") + " V = " + (isFlag_v() ? "1" : "0");
 
         // Summarize memory:
-        finalState += "\n# Valid memory addresses:";
+        finalState += "\n\n# Valid memory addresses:";
         for (int i : validMemory) {
             finalState += "\n#    mem[" + i + "] = " + memory[i];
         }

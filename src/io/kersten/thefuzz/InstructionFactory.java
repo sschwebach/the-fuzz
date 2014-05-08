@@ -419,8 +419,7 @@ public class InstructionFactory {
                             instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
                                     (short) aluResult + ")");
                         } else {
-                            instr.appendComment("(not executed, " +
-                                    "flags unchanged)");
+                            // Not executed, flags unchanged.
                         }
                         break;
                     case SUB:
@@ -479,8 +478,12 @@ public class InstructionFactory {
                 // Okay, update the state of the target register with the ALU
                 // result. Don't write to R0 though...
                 if (instr.getArguments().get(0).value_register != Register.R0)
-                    p.getRegisterFile()[instr.getArguments().get(0)
-                            .value_register.getNumber()] = (short) aluResult;
+                    if (instr.getiOpcode().getOpcode() == IOpcode.Opcode.ADDZ
+                            && !p.isFlag_z())
+                        instr.appendComment("not executed.");
+                    else
+                        p.getRegisterFile()[instr.getArguments().get(0)
+                                .value_register.getNumber()] = (short) aluResult;
                 else
                     instr.appendComment("No change to R0");
             }
