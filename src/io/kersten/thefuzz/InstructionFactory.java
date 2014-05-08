@@ -89,8 +89,7 @@ public class InstructionFactory {
             generateFailurePath(p, newInstrs);
         } else if (mnemonic.equalsIgnoreCase("LW") || mnemonic
                 .equalsIgnoreCase("SW")) {
-            //TODO
-
+            
             // Need to do the following:
             // 1) Make sure the random addresses generated are valid (this
             // means, the value in the register plus the immOffset is valid on a
@@ -103,7 +102,6 @@ public class InstructionFactory {
                 if (p.getValidMemory().size() == 0) {
                     // No valid addresses - can't generate a load instruction
                     // yet!
-                    //TODO Make sure we add things to this when generating sw's
                     return new ArrayList<Instruction>();
                 }
 
