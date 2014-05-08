@@ -24,7 +24,8 @@ public abstract class IOpcode {
         ArrayList<String> ops = new ArrayList<String>();
 
         for (Opcode o : Opcode.values()) {
-            ops.add(o.toString().toUpperCase());
+            if (o != Opcode.HLT)
+                ops.add(o.toString().toUpperCase());
         }
 
         return ops;
@@ -41,7 +42,7 @@ public abstract class IOpcode {
 
     public enum Opcode {
         ADD, ADDZ, SUB, AND, NOR, SLL, SRL, SRA, LW, SW, LHB, LLB, B, JAL,
-        JR;
+        JR, HLT;
     }
 
     private Opcode opcode;
