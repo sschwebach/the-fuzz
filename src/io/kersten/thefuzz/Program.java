@@ -188,11 +188,12 @@ public class Program {
 
         // Summarize registers
         for (int i = 0; i < registerFile.length; i++) {
-            finalState += "\n# R" + i + " = " + registerFile[i];
+            finalState += "\n# R" + i + " = " + (isRegisterValid
+                    (registerFromNumber(i)) ? registerFile[i] : "xxxx");
         }
 
         // Summarize flags
-        finalState += "\n\n# Z =" + (isFlag_z() ? "1" : "0") + " N = " +
+        finalState += "\n\n# Z = " + (isFlag_z() ? "1" : "0") + " N = " +
                 (isFlag_n()
                 ? "1" : "0") + " V = " + (isFlag_v() ? "1" : "0");
 
