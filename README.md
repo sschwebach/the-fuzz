@@ -9,7 +9,7 @@ generating the fuzz tests, so it can insert branches and generate taken/not
 taken pass/failure paths. It also performs safe register and memory accesses
 (it will not attempt to read from uninitialized registers or invalid memory
 locations). (This may not be the exact spirit of fuzz testing,
-but this decision was made in the interest of generating useful test for our
+but this decision was made in the interest of generating useful tests for our
 processor.)
 
 # Features
