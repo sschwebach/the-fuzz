@@ -18,6 +18,8 @@ public class Argument {
                     Condition condition) {
         //Randomly select a value for this argument...
         this.type = type;
+        this.value_label = labelName;
+        this.value_condition = condition;
     }
 
     public String print() {
