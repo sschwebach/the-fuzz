@@ -305,7 +305,11 @@ public class InstructionFactory {
         for (Instruction i : newInstrs)
             if (i.getArguments().size() > 0)
                 if (i.getArguments().get(0).getType() == ArgumentType.REGISTER)
-                    p.setRegisterValid(i.getArguments().get(0).value_register);
+                    // Don't know for sure if any addz executed,
+                    // so set it valid only when it simulates (different method)
+                    if (i.getiOpcode().getOpcode() != IOpcode.Opcode.ADDZ)
+                        p.setRegisterValid(i.getArguments().get(0)
+                                .value_register);
 
         return newInstrs;
     }
@@ -418,6 +422,11 @@ public class InstructionFactory {
                                 setNTo = true;
                             instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
                                     (short) aluResult + ")");
+
+                            // Now we know for sure that an ADDZ executed,
+                            // so set its target to valid.
+                            p.setRegisterValid(instr.getArguments().get(0)
+                                    .value_register);
                         } else {
                             // Not executed, flags unchanged.
                         }
@@ -480,7 +489,7 @@ public class InstructionFactory {
                 if (instr.getArguments().get(0).value_register != Register.R0)
                     if (instr.getiOpcode().getOpcode() == IOpcode.Opcode.ADDZ
                             && !p.isFlag_z())
-                        instr.appendComment("not executed.");
+                        instr.appendComment("not executed");
                     else
                         p.getRegisterFile()[instr.getArguments().get(0)
                                 .value_register.getNumber()] = (short) aluResult;
