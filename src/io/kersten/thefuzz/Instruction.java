@@ -1,6 +1,7 @@
 package io.kersten.thefuzz;
 
 import com.sun.org.apache.xpath.internal.Arg;
+import io.kersten.thefuzz.opcodes.Label;
 
 import java.util.ArrayList;
 
@@ -44,13 +45,19 @@ public class Instruction {
     }
 
     public String print() {
-        String build = iOpcode.getMnemonic() + " ";
+        String build = (iOpcode instanceof Label ? "" : "  ") +
+                iOpcode.getMnemonic() + " ";
 
         int c = 0;
         for (Argument a : arguments) {
             build += a.print() + (c == arguments.size() - 1 ? "" : ", ");
             c++;
         }
+
+        // Attempt to align comments...
+        int numSpaces = Math.max(0, 32 - build.length());
+        for (int i = 0; i < numSpaces; i++)
+            build += " ";
 
         build += " #" + getComment();
         return build;
