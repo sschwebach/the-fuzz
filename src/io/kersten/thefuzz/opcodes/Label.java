@@ -25,7 +25,7 @@ public class Label extends IOpcode {
 
     @Override
     public ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[] {};
+        return new ArgumentType[0];
     }
 
     @Override
