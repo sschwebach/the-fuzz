@@ -284,7 +284,7 @@ public class InstructionFactory {
                 do {
                     addr = (int) (Math.random() * (p.getMemory().length - p
                         .getMemoryDataOffset()));
-                } while (addr > (2 << 15 - 1));
+                } while (addr > ((1 << 15) - 1));
 
                 int offset = (int) (Math.random() * 16) - 8;
 
@@ -482,9 +482,9 @@ public class InstructionFactory {
                 // Perform the ALU operation.
                 switch (instr.getiOpcode().getOpcode()) {
                     case ADD:
-                        if (arg1 + arg2 > 2 << 15 - 1)
+                        if (arg1 + arg2 > (1 << 15) - 1)
                             setVTo = true;
-                        aluResult = Math.min(arg1 + arg2, 2 << 15 - 1);
+                        aluResult = Math.min(arg1 + arg2, (1 << 15) - 1);
                         if (aluResult == 0)
                             setZTo = true;
                         if (aluResult < 0)
@@ -494,9 +494,9 @@ public class InstructionFactory {
                         break;
                     case ADDZ:
                         if (p.isFlag_z()) {
-                            if (arg1 + arg2 > 2 << 15 - 1)
+                            if (arg1 + arg2 > (1 << 15) - 1)
                                 setVTo = true;
-                            aluResult = Math.min(arg1 + arg2, 2 << 15 - 1);
+                            aluResult = Math.min(arg1 + arg2, (1 << 15) - 1);
                             if (aluResult == 0)
                                 setZTo = true;
                             if (aluResult < 0)
@@ -513,9 +513,9 @@ public class InstructionFactory {
                         }
                         break;
                     case SUB:
-                        if (arg1 - arg2 < -(2 << 15))
+                        if (arg1 - arg2 < -(1 << 15))
                             setVTo = true;
-                        aluResult = Math.max(arg1 - arg2, -(2 << 15));
+                        aluResult = Math.max(arg1 - arg2, -(1 << 15));
                         if (aluResult == 0)
                             setZTo = true;
                         if (aluResult < 0)
