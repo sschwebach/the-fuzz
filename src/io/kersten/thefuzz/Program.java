@@ -1,11 +1,14 @@
 package io.kersten.thefuzz;
 
 import io.kersten.thefuzz.opcodes.HLT;
+import io.kersten.thefuzz.opcodes.Label;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Program {
+
+    private boolean generateGlobalNotTaken = false;
 
     /**
      * Convert a number to its corresponding Register enum entry.
@@ -182,6 +185,18 @@ public class Program {
      * and valid memory addresses.
      */
     public void terminate() {
+        // If we have any branches which should not be taken,
+        // we need to create a failure handler for if they were taken.
+        if (generateGlobalNotTaken) {
+            // XXX: In the future, if we want to set specific flags here,
+            // can add more instructions after the label and add an
+            // unconditional branch above it to avoid executing the block at
+            // the end of the program.
+            instructions.add(new Instruction(new Label("nottaken")));
+            instructions.get(instructions.size() - 1).appendComment("failure " +
+                    "case for wrongly taken branches");
+        }
+
         instructions.add(new Instruction(new HLT()));
 
         String finalState = "\n";
@@ -209,5 +224,9 @@ public class Program {
 
     public ArrayList<Instruction> getInstructions() {
         return instructions;
+    }
+
+    public void setGenerateGlobalNotTaken() {
+        generateGlobalNotTaken = true;
     }
 }

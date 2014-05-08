@@ -50,17 +50,80 @@ public class InstructionFactory {
         // need to check if it sets flags and set those flags.
         // set flags if the instruction needs it
         if (mnemonic.equalsIgnoreCase("B")) {
-            //TODO
 
             // Need to do the following:
             // 1) Look at current state of the Program's register file and
             // think up a condition on which we could branch.
             // 2) Generate failure and success paths - this could be in
             // either order (i.e. this can generate both taken and not-taken
-            // branches).
-            return new ArrayList<Instruction>(); //todo
+            // branches). In one case, there will be an unconditional branch at
+            // the end of the success path to skip the failure path.
+            int thisLabel = p.getLabelCount();
+            p.incLabelCount();
+
+            // Choose a condition
+            int condIdx = (int)(Math.random() * Condition.values().length);
+            Condition cond = Condition.values()[condIdx];
+
+            // Determine if a branch on this condition will be taken or not.
+            boolean conditionIsTrue = false;
+            switch (cond) {
+                case NEQ:
+                    conditionIsTrue = !p.isFlag_z();
+                    break;
+                case EQ:
+                    conditionIsTrue = p.isFlag_z();
+                    break;
+                case GT:
+                    conditionIsTrue = !p.isFlag_z() && !p.isFlag_n();
+                    break;
+                case LT:
+                    conditionIsTrue = p.isFlag_n();
+                    break;
+                case GTE:
+                    conditionIsTrue = !p.isFlag_n();
+                    break;
+                case LTE:
+                    conditionIsTrue = p.isFlag_n() || p.isFlag_z();
+                    break;
+                case OVFL:
+                    conditionIsTrue = p.isFlag_v();
+                    break;
+                case UNCOND:
+                    conditionIsTrue = true;
+                    break;
+            }
+
+            newInstrs.get(0).appendComment("branch on " + cond + ", " +
+                    "take = " + (conditionIsTrue ? "yes" : "no"));
+
+            // Add the condition. If the condition is true and we take the
+            // branch, we pass. Else, branch to a failure condition and add a
+            // skip before it in the regular code.
+            newInstrs.get(0).addArgument(new Argument(p, ArgumentType.CONDITION,
+                    null, cond));
+            newInstrs.get(0).addArgument(new Argument(p, ArgumentType.LABEL,
+                    (conditionIsTrue ? "taken" + thisLabel : "nottaken"), null));
+
+            if (conditionIsTrue) {
+                // We need a failure path followed by a thisLabel,
+                // since this branch should skip it.
+
+                generateFailurePath(p, newInstrs);
+                newInstrs.add(new Instruction(new Label("taken" + thisLabel)));
+            } else {
+                // The fall-through path is correct, and if we take the branch
+                // on accident we need to go to the global nottaken failure.
+                // Set the program to generate a global nottaken failure case.
+                p.setGenerateGlobalNotTaken();
+            }
+
+            // XXX: Don't really need to simulate this,
+            // but don't want to forget to call simulate if we ever wind up
+            // needing it.
+            simulateLastInstruction(p, newInstrs.get(0));
+
         } else if (mnemonic.equalsIgnoreCase("JAL")) {
-            //TODO
 
             // Need to do the following:
             // 1) Generate a failure path (right after this instruction,
@@ -554,12 +617,15 @@ public class InstructionFactory {
                                     .value_register.getNumber()]);
                     break;
                 case B:
-                    throw new RuntimeException("Branching not implemented yet" +
-                            ".");
+                    // TODO: Branching really doesn't need to be simulated
+                    // unless we start simulating more complex processor
+                    // structures, which we don't need to do for the purposes
+                    // of our testing. For now, we just generate the control
+                    // path for branching.
+                    break;
                 default:
                     throw new RuntimeException("How did we get here? (2)");
             }
-            //TODO
         } else {
             // These instructions just modify the PC.
             // Candidates: JAL, JR
