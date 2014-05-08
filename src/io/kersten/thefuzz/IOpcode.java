@@ -24,7 +24,7 @@ public abstract class IOpcode {
         ArrayList<String> ops = new ArrayList<String>();
 
         for (Opcode o : Opcode.values()) {
-            if (o != Opcode.HLT)
+            if (o != Opcode.HLT && o != Opcode.JR)
                 ops.add(o.toString().toUpperCase());
         }
 

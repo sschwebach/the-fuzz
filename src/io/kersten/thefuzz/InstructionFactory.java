@@ -65,13 +65,17 @@ public class InstructionFactory {
             // Need to do the following:
             // 1) Generate a failure path (right after this instruction,
             // since it's an unconditional).
+            //
             // 2) Generate a label to branch to and insert at the end of the
             // generated instructions.
 
 
             return new ArrayList<Instruction>(); //todo
         } else if (mnemonic.equalsIgnoreCase("JR")) {
-            //TODO
+
+            // XXX: Not actually implementing because this will jump us back
+            // to wherever we JAL'd from, and that'll be a little hard to test
+            // Really, any complex JR constructions should be tested manually.
 
             // Need to do the following:
             // 0) Only generate this if R15 is valid.
@@ -89,7 +93,7 @@ public class InstructionFactory {
             generateFailurePath(p, newInstrs);
         } else if (mnemonic.equalsIgnoreCase("LW") || mnemonic
                 .equalsIgnoreCase("SW")) {
-            
+
             // Need to do the following:
             // 1) Make sure the random addresses generated are valid (this
             // means, the value in the register plus the immOffset is valid on a
@@ -543,6 +547,14 @@ public class InstructionFactory {
         } else {
             // These instructions just modify the PC.
             // Candidates: JAL, JR
+
+            switch (instr.getiOpcode().getOpcode()) {
+                case JR:
+                    throw new RuntimeException("JR not implemented - too complex " +
+                            "to make subroutines right now. Test manually.");
+                case JAL:
+                    break;
+            }
 
             //TODO
         }
