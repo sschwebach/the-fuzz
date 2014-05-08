@@ -587,19 +587,22 @@ public class InstructionFactory {
         }
 
         // Now, set flags if the previous instruction would have.
-        if (instr.getiOpcode().setsZ()) {
-            p.setFlag_z(setZTo);
-            instr.appendComment("Z->" + (setZTo ? "1" : "0"));
-        }
+        if (!(instr.getiOpcode().getOpcode() == IOpcode.Opcode.ADDZ && !p
+                .isFlag_z())) {
+            if (instr.getiOpcode().setsZ()) {
+                p.setFlag_z(setZTo);
+                instr.appendComment("Z->" + (setZTo ? "1" : "0"));
+            }
 
-        if (instr.getiOpcode().setsN()) {
-            p.setFlag_n(setNTo);
-            instr.appendComment("N->" + (setNTo ? "1" : "0"));
-        }
+            if (instr.getiOpcode().setsN()) {
+                p.setFlag_n(setNTo);
+                instr.appendComment("N->" + (setNTo ? "1" : "0"));
+            }
 
-        if (instr.getiOpcode().setsV()) {
-            p.setFlag_v(setVTo);
-            instr.appendComment("V->" + (setVTo ? "1" : "0"));
+            if (instr.getiOpcode().setsV()) {
+                p.setFlag_v(setVTo);
+                instr.appendComment("V->" + (setVTo ? "1" : "0"));
+            }
         }
     }
 
