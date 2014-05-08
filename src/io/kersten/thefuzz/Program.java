@@ -206,4 +206,8 @@ public class Program {
 
         instructions.get(instructions.size() - 1).appendComment(finalState);
     }
+
+    public ArrayList<Instruction> getInstructions() {
+        return instructions;
+    }
 }

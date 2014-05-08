@@ -69,8 +69,22 @@ public class InstructionFactory {
             // 2) Generate a label to branch to and insert at the end of the
             // generated instructions.
 
+            int thisLabel = p.getLabelCount();
+            p.incLabelCount();
 
-            return new ArrayList<Instruction>(); //todo
+            // Add a label to jump to.
+            newInstrs.get(0).addArgument(new Argument(p, ArgumentType.LABEL,
+                    "linklabel" + thisLabel, null));
+
+
+            simulateLastInstruction(p, newInstrs.get(0)); // Load R15
+
+            // Generate a failure path and then add our target label at the end.
+            generateFailurePath(p, newInstrs);
+
+            // Add target label
+            newInstrs.add(new Instruction(new Label("linklabel" + thisLabel)));
+
         } else if (mnemonic.equalsIgnoreCase("JR")) {
 
             // XXX: Not actually implementing because this will jump us back
@@ -88,6 +102,8 @@ public class InstructionFactory {
                     ArgumentType.REGISTER, null, null));
             newInstrs.get(0).getArguments().get(0).value_register =
                     Register.R15;
+
+            simulateLastInstruction(p, newInstrs.get(0));
 
             // Add a fall-through failure path after that.
             generateFailurePath(p, newInstrs);
@@ -553,10 +569,21 @@ public class InstructionFactory {
                     throw new RuntimeException("JR not implemented - too complex " +
                             "to make subroutines right now. Test manually.");
                 case JAL:
+                    // Loads PC + 1 into R15. The program doesn't have this
+                    // instruction yet though. It needs one past this
+                    // instruction.
+                    // XXX: Assume that this instruction would be the next one
+                    // to be added to p's list of instructions,
+                    // so the last instruction in p.instructions is PC - 1.
+                    short pcp1 = (short)(p.getInstructions().size() + 2);
+                    p.getRegisterFile()[Register.R15.getNumber()] = pcp1;
+
+                    // Also set R15 as valid now...
+                    p.setRegisterValid(Register.R15);
+                    instr.appendComment("R15 linked to PC=" + pcp1);
+
                     break;
             }
-
-            //TODO
         }
 
         // Now, set flags if the previous instruction would have.
@@ -659,5 +686,9 @@ public class InstructionFactory {
 
         // TODO: We might want to generate longer failure paths at random to
         // test things like erroneous instruction fetches or something.
+        // XXX: Be careful though! Any target registers referenced here will
+        // become valid because of our overzealous validity checking earlier
+        // in generateInstruction. So fill it with NoOPs if at all possible.
+        // Like an add into R0.
     }
 }
