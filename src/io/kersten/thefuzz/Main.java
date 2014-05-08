@@ -1,5 +1,6 @@
 package io.kersten.thefuzz;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -85,6 +86,34 @@ public class Main {
         }
 
         System.out.println("");
-        program.print();
+        String output = program.print();
+
+        File f = new File(filename + "_" + (int)
+                (Math
+                .random() *
+                10000) + ".txt");
+
+        System.out.println(f.getAbsolutePath());
+        try {
+        if (!f.createNewFile()) {
+            throw new RuntimeException("Sadness in creating file ):");
+        }} catch (IOException ioe) {
+            System.err.println(ioe.getLocalizedMessage());
+            throw new RuntimeException("Extra sadness in creating file ):");
+        }
+
+        if (!f.canWrite()) {
+            throw new RuntimeException("Can't write...");
+        }
+
+        try {
+            BufferedOutputStream bw = new BufferedOutputStream(new
+                    FileOutputStream
+                    (f));
+            bw.write(output.getBytes(), 0, output.getBytes().length);
+            bw.close();
+        } catch (Exception e ){
+            System.err.println("We lose.");
+        }
     }
 }
