@@ -67,15 +67,26 @@ public class InstructionFactory {
             // since it's an unconditional).
             // 2) Generate a label to branch to and insert at the end of the
             // generated instructions.
+
+
             return new ArrayList<Instruction>(); //todo
         } else if (mnemonic.equalsIgnoreCase("JR")) {
             //TODO
 
             // Need to do the following:
+            // 0) Only generate this if R15 is valid.
             // 1) Generate a failure path (right after the jump).
-            // 2) Generate a label to branch to.
-            return new ArrayList<Instruction>(); //todo
 
+            if (!p.isRegisterValid(Register.R15))
+                return new ArrayList<Instruction>();
+
+            newInstrs.get(0).addArgument(new Argument(p,
+                    ArgumentType.REGISTER, null, null));
+            newInstrs.get(0).getArguments().get(0).value_register =
+                    Register.R15;
+
+            // Add a fall-through failure path after that.
+            generateFailurePath(p, newInstrs);
         } else if (mnemonic.equalsIgnoreCase("LW") || mnemonic
                 .equalsIgnoreCase("SW")) {
             //TODO
@@ -408,7 +419,8 @@ public class InstructionFactory {
                             instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
                                     (short) aluResult + ")");
                         } else {
-                            instr.appendComment("(not executed)");
+                            instr.appendComment("(not executed, " +
+                                    "flags unchanged)");
                         }
                         break;
                     case SUB:
@@ -604,5 +616,26 @@ public class InstructionFactory {
         }
 
         return null;
+    }
+
+    /**
+     * Generates a dead-end failure path of instrs into which the program
+     * control flow will fall if a branch/jump fails.
+     *
+     * @param p The program so we can look at register states
+     * @param instrs The instruction set which will be populated.
+     */
+    private static void generateFailurePath(Program p, ArrayList<Instruction>
+            instrs) {
+
+        // The most basic implementation of this will just be a failure label
+        // followed by a halt.
+        instrs.add(new Instruction(new Label("fail" + p.getLabelCount())));
+        p.incLabelCount();
+
+        instrs.add(new Instruction(new HLT()));
+
+        // TODO: We might want to generate longer failure paths at random to
+        // test things like erroneous instruction fetches or something.
     }
 }
