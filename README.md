@@ -1,6 +1,7 @@
 # TheFuzz
-This program generates asm [fuzz tests](http://en.wikipedia
-.org/wiki/Fuzz_testing) for the WISC-14 ISA for ECE552.
+This program generates asm
+[fuzz tests](http://en.wikipedia.org/wiki/Fuzz_testing) for the WISC-14 ISA
+for ECE552.
 
 This isn't quite "random" input, but rather an intelligent fuzz tester - it
 keeps an expected state of the WISC processor and memory space while
