@@ -1,4 +1,4 @@
-# TheFuzz
+# the fuzz
 This program generates asm
 [fuzz tests](http://en.wikipedia.org/wiki/Fuzz_testing) for the WISC-14 ISA
 for ECE552.
