@@ -41,8 +41,8 @@ public abstract class IOpcode {
     }
 
     public enum Opcode {
-        ADD, ADDZ, SUB, AND, NOR, SLL, SRL, SRA, LW, SW, LHB, LLB, B, JAL,
-        JR, HLT;
+        ADD, ADDZ, SUB, AND, NAND, NOR, XOR, SLL, SRL, SRA, LW, SW, LHB, LLB, B, JAL,
+        JR, HLT, INC, CALL, RET;
     }
 
     private Opcode opcode;
