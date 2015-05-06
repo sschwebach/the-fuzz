@@ -62,7 +62,7 @@ public class InstructionFactory {
             p.incLabelCount();
 
             // Choose a condition
-            int condIdx = (int)(Math.random() * Condition.values().length);
+            int condIdx = (int) (Math.random() * Condition.values().length);
             Condition cond = Condition.values()[condIdx];
 
             // Determine if a branch on this condition will be taken or not.
@@ -283,7 +283,7 @@ public class InstructionFactory {
                 // Eh, screw it, keep addresses positive in 16-bit signed.
                 do {
                     addr = (int) (Math.random() * (p.getMemory().length - p
-                        .getMemoryDataOffset()));
+                            .getMemoryDataOffset()));
                 } while (addr > ((1 << 15) - 1));
 
                 int offset = (int) (Math.random() * 16) - 8;
@@ -388,9 +388,8 @@ public class InstructionFactory {
                 if (i.getArguments().get(0).getType() == ArgumentType.REGISTER)
                     // Don't know for sure if any addz executed,
                     // so set it valid only when it simulates (different method)
-                    if (i.getiOpcode().getOpcode() != IOpcode.Opcode.ADDZ)
-                        p.setRegisterValid(i.getArguments().get(0)
-                                .value_register);
+                    p.setRegisterValid(i.getArguments().get(0)
+                            .value_register);
 
         return newInstrs;
     }
@@ -492,26 +491,6 @@ public class InstructionFactory {
                         instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
                                 (short) aluResult + ")");
                         break;
-                    case ADDZ:
-                        if (p.isFlag_z()) {
-                            if (arg1 + arg2 > (1 << 15) - 1)
-                                setVTo = true;
-                            aluResult = Math.min(arg1 + arg2, (1 << 15) - 1);
-                            if (aluResult == 0)
-                                setZTo = true;
-                            if (aluResult < 0)
-                                setNTo = true;
-                            instr.appendComment("(" + arg1 + "+" + arg2 + "=" +
-                                    (short) aluResult + ")");
-
-                            // Now we know for sure that an ADDZ executed,
-                            // so set its target to valid.
-                            p.setRegisterValid(instr.getArguments().get(0)
-                                    .value_register);
-                        } else {
-                            // Not executed, flags unchanged.
-                        }
-                        break;
                     case SUB:
                         if (arg1 - arg2 < -(1 << 15))
                             setVTo = true;
@@ -523,20 +502,26 @@ public class InstructionFactory {
                         instr.appendComment("(" + arg1 + "-" + arg2 + "=" +
                                 (short) aluResult + ")");
                         break;
-                    case AND:
-                        aluResult = arg1 & arg2;
+                    case NAND:
+                        aluResult = ~(arg1 & arg2);
+                        setVTo = false;
+                        setNTo = false;
                         if (aluResult == 0)
                             setZTo = true;
-                        instr.appendComment("(" + arg1 + "&" + arg2 + "=" +
+                        instr.appendComment("(" + arg1 + "!&" + arg2 + "=" +
                                 (short) aluResult + ")");
                         break;
-                    case NOR:
-                        aluResult = ~(arg1 | arg2);
+                    case XOR:
+                        aluResult = (arg1 ^ arg2);
+                        setVTo = false;
+                        setNTo = false;
                         if (aluResult == 0)
                             setZTo = true;
-                        instr.appendComment("(~(" + arg1 + "|" + arg2 + ")=" +
+                        instr.appendComment("(~(" + arg1 + "^" + arg2 + ")=" +
                                 (short) aluResult + ")");
                         break;
+                    case INC:
+                        // TODO
                     case SLL:
                         aluResult = arg1 << arg2;
                         if (aluResult == 0)
@@ -561,6 +546,8 @@ public class InstructionFactory {
                         instr.appendComment("(" + arg1 + ">>>" + arg2 + "=" +
                                 (short) aluResult + ")");
                         break;
+                    case INC:
+                        throw new RuntimeException("INC currently not supported!");
                     default:
                         throw new RuntimeException("How did we get here? (1)");
                 }
@@ -568,12 +555,8 @@ public class InstructionFactory {
                 // Okay, update the state of the target register with the ALU
                 // result. Don't write to R0 though...
                 if (instr.getArguments().get(0).value_register != Register.R0)
-                    if (instr.getiOpcode().getOpcode() == IOpcode.Opcode.ADDZ
-                            && !p.isFlag_z())
-                        instr.appendComment("not executed");
-                    else
-                        p.getRegisterFile()[instr.getArguments().get(0)
-                                .value_register.getNumber()] = (short) aluResult;
+                    p.getRegisterFile()[instr.getArguments().get(0)
+                            .value_register.getNumber()] = (short) aluResult;
                 else
                     instr.appendComment("No change to R0");
             }
@@ -604,9 +587,9 @@ public class InstructionFactory {
                 case LLB:
                     if (instr.getArguments().get(0).value_register != Register
                             .R0) {
-                    p.getRegisterFile()[instr.getArguments().get(0)
-                            .value_register.getNumber()] = (instr
-                            .getArguments().get(1).value_immediate);
+                        p.getRegisterFile()[instr.getArguments().get(0)
+                                .value_register.getNumber()] = (instr
+                                .getArguments().get(1).value_immediate);
                     } else {
                         instr.appendComment("No change to R0");
                     }
@@ -628,9 +611,18 @@ public class InstructionFactory {
             }
         } else {
             // These instructions just modify the PC.
-            // Candidates: JAL, JR
+            // Candidates: CALL, RET
 
             switch (instr.getiOpcode().getOpcode()) {
+                case CALL:
+                    //TODO
+                    throw new RuntimeException("CALL not implemented - too complex " +
+                            "to make subroutines right now. Test manually.");
+                case RET:
+                    //TODO
+                    throw new RuntimeException("RET not implemented - too complex " +
+                            "to make subroutines right now. Test manually.");
+                /*
                 case JR:
                     throw new RuntimeException("JR not implemented - too complex " +
                             "to make subroutines right now. Test manually.");
@@ -649,27 +641,27 @@ public class InstructionFactory {
                     instr.appendComment("R15 linked to PC=" + pcp1);
 
                     break;
+                    */
             }
         }
 
         // Now, set flags if the previous instruction would have.
-        if (!(instr.getiOpcode().getOpcode() == IOpcode.Opcode.ADDZ && !p
-                .isFlag_z())) {
-            if (instr.getiOpcode().setsZ()) {
-                p.setFlag_z(setZTo);
-                instr.appendComment("Z->" + (setZTo ? "1" : "0"));
-            }
 
-            if (instr.getiOpcode().setsN()) {
-                p.setFlag_n(setNTo);
-                instr.appendComment("N->" + (setNTo ? "1" : "0"));
-            }
-
-            if (instr.getiOpcode().setsV()) {
-                p.setFlag_v(setVTo);
-                instr.appendComment("V->" + (setVTo ? "1" : "0"));
-            }
+        if (instr.getiOpcode().setsZ()) {
+            p.setFlag_z(setZTo);
+            instr.appendComment("Z->" + (setZTo ? "1" : "0"));
         }
+
+        if (instr.getiOpcode().setsN()) {
+            p.setFlag_n(setNTo);
+            instr.appendComment("N->" + (setNTo ? "1" : "0"));
+        }
+
+        if (instr.getiOpcode().setsV()) {
+            p.setFlag_v(setVTo);
+            instr.appendComment("V->" + (setVTo ? "1" : "0"));
+        }
+
     }
 
     public static IOpcode opcodeFromMnemonic(String mnemonic) {
@@ -733,6 +725,26 @@ public class InstructionFactory {
             return new JR();
         }
 
+        if (mnemonic.equalsIgnoreCase("NAND")){
+            return new NAND();
+        }
+
+        if (mnemonic.equalsIgnoreCase("XOR")){
+            return new XOR();
+        }
+
+        if (mnemonic.equalsIgnoreCase("CALL")){
+            return new CALL();
+        }
+
+        if (mnemonic.equalsIgnoreCase("RET")){
+            return new RET();
+        }
+
+        if (mnemonic.equalsIgnoreCase("INC")){
+            return new INC();
+        }
+
         return null;
     }
 
@@ -740,7 +752,7 @@ public class InstructionFactory {
      * Generates a dead-end failure path of instrs into which the program
      * control flow will fall if a branch/jump fails.
      *
-     * @param p The program so we can look at register states
+     * @param p      The program so we can look at register states
      * @param instrs The instruction set which will be populated.
      */
     private static void generateFailurePath(Program p, ArrayList<Instruction>

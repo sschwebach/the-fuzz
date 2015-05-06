@@ -5,7 +5,7 @@ import io.kersten.thefuzz.IOpcode;
 
 public class JR extends IOpcode {
     public JR() {
-        super(Opcode.JR);
+        super(Opcode.RET);
     }
 
     @Override

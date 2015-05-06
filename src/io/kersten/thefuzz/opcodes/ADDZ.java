@@ -5,7 +5,7 @@ import io.kersten.thefuzz.IOpcode;
 
 public class ADDZ extends IOpcode {
     public ADDZ() {
-        super(Opcode.ADDZ);
+        super(Opcode.ADD);
     }
 
     @Override

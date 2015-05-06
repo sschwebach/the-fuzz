@@ -5,7 +5,7 @@ import io.kersten.thefuzz.IOpcode;
 
 public class NOR extends IOpcode {
     public NOR() {
-        super(Opcode.NOR);
+        super(Opcode.XOR);
     }
 
     @Override

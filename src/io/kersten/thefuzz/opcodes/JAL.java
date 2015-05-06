@@ -6,7 +6,7 @@ import io.kersten.thefuzz.IOpcode;
 public class JAL extends IOpcode {
 
     public JAL() {
-        super(Opcode.JAL);
+        super(Opcode.CALL);
     }
 
     @Override

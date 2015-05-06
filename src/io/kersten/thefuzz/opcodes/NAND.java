@@ -14,31 +14,35 @@ public class NAND extends IOpcode {
 
     @Override
     public String getMnemonic() {
-        return null;
+        return "NAND";
     }
 
     @Override
     public int getArgumentCount() {
-        return 0;
+        return 3;
     }
 
     @Override
     public ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[0];
+        return new ArgumentType[] {
+                ArgumentType.REGISTER,
+                ArgumentType.VREGISTER,
+                ArgumentType.VREGISTER
+        };
     }
 
     @Override
     public boolean setsZ() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean setsN() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean setsV() {
-        return false;
+        return true;
     }
 }

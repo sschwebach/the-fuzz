@@ -5,7 +5,7 @@ import io.kersten.thefuzz.IOpcode;
 
 public class AND extends IOpcode {
     public AND() {
-        super(Opcode.AND);
+        super(Opcode.NAND);
     }
     @Override
     public String getMnemonic() {

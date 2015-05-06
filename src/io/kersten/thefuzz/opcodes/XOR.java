@@ -14,17 +14,21 @@ public class XOR extends IOpcode {
 
     @Override
     public String getMnemonic() {
-        return null;
+        return "XOR";
     }
 
     @Override
     public int getArgumentCount() {
-        return 0;
+        return 3;
     }
 
     @Override
     public ArgumentType[] getArgumentTypes() {
-        return new ArgumentType[0];
+        return new ArgumentType[] {
+                ArgumentType.REGISTER,
+                ArgumentType.VREGISTER,
+                ArgumentType.VREGISTER
+        };
     }
 
     @Override
